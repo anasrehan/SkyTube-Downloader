@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors');
+// const cors = require('cors');
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -7,7 +7,13 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
-app.use(cors());
+const cors = require('cors');
+app.use(cors({
+  origin: "*", // 🚀 Allow All Origins (For Testing)
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"]
+}));
+
 app.use(express.json())
 const runYtdlp = (command) => {
   return new Promise((resolve, reject) => {
