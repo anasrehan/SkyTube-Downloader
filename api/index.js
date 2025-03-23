@@ -7,7 +7,12 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: "*", // 🚀 Allow All Origins (For Testing)
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"]
+}));
+
 app.use(express.json())
 const runYtdlp = (command) => {
   return new Promise((resolve, reject) => {
