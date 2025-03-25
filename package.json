@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "postinstall": "apt-get update && apt-get install -y python3-pip && pip3 install yt-dlp",
     "start": "nodemon api/index.js",
-    "dev": "nodemon api/index.js",  
+    "dev": "nodemon api/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
