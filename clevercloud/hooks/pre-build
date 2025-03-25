@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "Installing missing dependencies..."
+apt-get update && apt-get install -y curl tar bash

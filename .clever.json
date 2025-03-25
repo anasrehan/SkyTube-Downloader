@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "app_id": "app_03c785e7-5548-47f3-87c2-6cb2be83a802",
+      "org_id": "user_5a1c8d03-3e11-4a7e-b687-e9b8ef3a5314",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_03c785e7-5548-47f3-87c2-6cb2be83a802.git",
+      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_03c785e7-5548-47f3-87c2-6cb2be83a802.git",
+      "name": "skytube--downloader",
+      "alias": "skytube-downloader"
+    }
+  ]
+}
