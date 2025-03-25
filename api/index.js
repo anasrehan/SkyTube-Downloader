@@ -2,21 +2,20 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const YTDlpWrap = require("yt-dlp-wrap");  // ✅ New yt-dlp Wrapper
-const ytDlp = new YTDlpWrap();             // ✅ Auto-detects yt-dlp
+const { exec } = require('child_process');
 
 const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(cors({
-  origin: "*", // 🚀 Allow All Origins (For Testing)
+  origin: "*",
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"]
 }));
 
 app.use(express.json());
 
-const SKYTUBE_FOLDER = path.join(__dirname, 'SkyTube'); // ✅ Folder for downloads
+const SKYTUBE_FOLDER = path.join(__dirname, 'SkyTube');
 
 // ✅ Function to check and create SkyTube folder
 const ensureSkyTubeFolder = () => {
@@ -26,22 +25,16 @@ const ensureSkyTubeFolder = () => {
   }
 };
 
-// ✅ Generic Function to Execute yt-dlp
+// ✅ Run yt-dlp command
 const runYtdlp = (args) => {
   return new Promise((resolve, reject) => {
-    let stdoutData = "";
-    let stderrData = "";
+    const command = `/home/anas-rehan/.local/bin/yt-dlp ${args.join(" ")}`;
 
-    const process = ytDlp.exec(args);
-    
-    process.stdout.on("data", (data) => (stdoutData += data));
-    process.stderr.on("data", (data) => (stderrData += data));
-
-    process.on("close", (code) => {
-      if (code === 0) {
-        resolve(stdoutData.trim());
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(`Error: ${stderr}`);
       } else {
-        reject(`yt-dlp Error: ${stderrData}`);
+        resolve(stdout);
       }
     });
   });
@@ -55,13 +48,10 @@ app.get('/videoDetails', async (req, res) => {
   }
 
   try {
-    const output = await runYtdlp(["-j", url]);  // ✅ yt-dlp JSON Output
+    const output = await runYtdlp(["-j", url]);
     const videoInfo = JSON.parse(output);
 
-    // ✅ Find best video + audio format
     const bestVideo = videoInfo.formats.find(f => f.vcodec !== 'none' && f.acodec !== 'none' && f.ext === 'mp4');
-
-    // ✅ Find best audio-only format
     const bestAudio = videoInfo.formats.find(f => f.acodec !== 'none' && f.vcodec === 'none');
 
     res.json({
@@ -84,12 +74,11 @@ app.get('/downloadVideo', async (req, res) => {
     return res.status(400).json({ error: 'YouTube URL is required' });
   }
 
-  ensureSkyTubeFolder(); // ✅ Ensure folder exists
-
+  ensureSkyTubeFolder();
   const filePath = path.join(SKYTUBE_FOLDER, 'video.mp4');
 
   try {
-    await runYtdlp(["-f", "bestaudio+bestvideo", "-o", filePath, url]);
+    await runYtdlp(["-f", "bestaudio+bestvideo", "-o", `"${filePath}"`, url]);
     res.json({ success: true, message: 'Video downloaded successfully!', path: filePath });
   } catch (err) {
     console.error('Error downloading video:', err);
@@ -104,12 +93,11 @@ app.get('/downloadAudio', async (req, res) => {
     return res.status(400).json({ error: 'YouTube URL is required' });
   }
 
-  ensureSkyTubeFolder(); // ✅ Ensure folder exists
-
+  ensureSkyTubeFolder();
   const filePath = path.join(SKYTUBE_FOLDER, 'audio.mp3');
 
   try {
-    await runYtdlp(["-f", "bestaudio", "--extract-audio", "--audio-format", "mp3", "-o", filePath, url]);
+    await runYtdlp(["-f", "bestaudio", "--extract-audio", "--audio-format", "mp3", "-o", `"${filePath}"`, url]);
     res.json({ success: true, message: 'Audio downloaded successfully in MP3 format!', path: filePath });
   } catch (err) {
     console.error('Error downloading audio:', err);
